@@ -4,7 +4,7 @@ I created this DevOps Project as a space to learn more about Azure and Azure Dev
 
 # Documentation
 ---
-In my quest to learn as much of Azure as I can I am going to define how to deploy Azure resource and configurations in four formats, ARM (JSON), Azure CLI, PowerShell and finally Terraform. I will format each file to closely follow the Azure Portal in terms of order and options to make it easy to read and to translate between different languages, so if you are learning like me, you may appreciate that work and I try to make use of comments where supported to explain everything that I am scripting.
+In my quest to learn as much of Azure as I can I am going to define how to deploy Azure resource and configurations in four formats, ARM (JSON), Azure CLI, and PowerShell. I will format each file to closely follow the Azure Portal in terms of order and options to make it easy to read and to translate between different languages, so if you are learning like me, you may appreciate that work and I try to make use of comments where supported to explain everything that I am scripting.
 
 # Contributions
 ---
