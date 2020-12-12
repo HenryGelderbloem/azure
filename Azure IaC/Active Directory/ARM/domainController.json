@@ -1,0 +1,273 @@
+{
+    "$schema": "https://schema.management.azure.com/schemas/2019-04-01/deploymentTemplate.json#",
+    "contentVersion": "2020.09.27.1600",
+    "parameters": {
+        "hubVirtualNetworkName": {
+            "type": "string",
+            "metadata": {
+                "description": "The name of the Hub Virtual Network."
+            }
+        },
+        "addsSubnetName": {
+            "type": "string",
+            "metadata": {
+                "description": "The name of the ADDS Subnet."
+            }
+        },
+        "addsSubnetAddressPrefix": {
+            "type": "string",
+            "defaultValue": "10.1.2.3/24",
+            "metadata": {
+                "description": "The Address Prefix of the ADDS Subnet."
+            }
+        }
+    },
+    "functions": [],
+    "variables": {
+        "addsNSGName": "[concat(toLower('adds-'), toLower(resourceGroup().location), toLower('-snet-nsg'))]",
+        "location": "[resourceGroup().location]"
+    },
+    "resources": [
+        {
+            "type": "Microsoft.Network/networkSecurityGroups",
+            "apiVersion": "2020-05-01",
+            "name": "[variables('addsNSGName')]",
+            "location": "[variables('location')]",
+            "properties": {
+                "securityRules": [
+                    {
+                        "name": "inboundDNSAllow",
+                        "properties": {
+                            "direction": "Inbound",
+                            "description": "Allow inbound DNS from any host.",
+                            "priority": 100,
+                            "sourcePortRange": "*",
+                            "destinationPortRange": "53",
+                            "protocol": "*",
+                            "sourceAddressPrefix": "VirtualNetwork",
+                            "destinationAddressPrefix": "*",
+                            "access": "Allow"
+                        }
+                    },
+                    {
+                        "name": "inboundKerberosAllow",
+                        "properties": {
+                            "direction": "Inbound",
+                            "description": "Allow inbound Kerberos from any host.",
+                            "priority": 101,
+                            "sourcePortRange": "*",
+                            "destinationPortRange": "88",
+                            "protocol": "Tcp",
+                            "sourceAddressPrefix": "VirtualNetwork",
+                            "destinationAddressPrefix": "*",
+                            "access": "Allow"
+                        }
+                    },
+                    {
+                        "name": "inboundNTPAllow",
+                        "properties": {
+                            "direction": "Inbound",
+                            "description": "Allow inbound NTP from any host.",
+                            "priority": 102,
+                            "sourcePortRange": "*",
+                            "destinationPortRange": "123",
+                            "protocol": "Udp",
+                            "sourceAddressPrefix": "VirtualNetwork",
+                            "destinationAddressPrefix": "*",
+                            "access": "Allow"
+                        }
+                    },
+                    {
+                        "name": "inboundRPCEndpointMapperAllow",
+                        "properties": {
+                            "direction": "Inbound",
+                            "description": "Allow inbound RPC Endpoint Mapper from any host.",
+                            "priority": 103,
+                            "sourcePortRange": "*",
+                            "destinationPortRange": "135",
+                            "protocol": "Tcp",
+                            "sourceAddressPrefix": "VirtualNetwork",
+                            "destinationAddressPrefix": "*",
+                            "access": "Allow"
+                        }
+                    },
+                    {
+                        "name": "inboundNetBIOSAllow",
+                        "properties": {
+                            "direction": "Inbound",
+                            "description": "Allow inbound NetBIOS from any host.",
+                            "priority": 104,
+                            "sourcePortRange": "*",
+                            "destinationPortRanges": [
+                                "137",
+                                "138"
+                            ],
+                            "protocol": "Udp",
+                            "sourceAddressPrefix": "VirtualNetwork",
+                            "destinationAddressPrefix": "*",
+                            "access": "Allow"
+                        }
+                    },
+                    {
+                        "name": "inboundNetBIOSSessionAllow",
+                        "properties": {
+                            "direction": "Inbound",
+                            "description": "Allow inbound NetBIOS Session from any host.",
+                            "priority": 105,
+                            "sourcePortRange": "*",
+                            "destinationPortRange": "139",
+                            "protocol": "Tcp",
+                            "sourceAddressPrefix": "VirtualNetwork",
+                            "destinationAddressPrefix": "*",
+                            "access": "Allow"
+                        }
+                    },
+                    {
+                        "name": "inboundLDAPAllow",
+                        "properties": {
+                            "direction": "Inbound",
+                            "description": "Allow inbound LDAP from any host.",
+                            "priority": 106,
+                            "sourcePortRange": "*",
+                            "destinationPortRange": "389",
+                            "protocol": "*",
+                            "sourceAddressPrefix": "VirtualNetwork",
+                            "destinationAddressPrefix": "*",
+                            "access": "Allow"
+                        }
+                    },
+                    {
+                        "name": "inboundSMBAllow",
+                        "properties": {
+                            "direction": "Inbound",
+                            "description": "Allow inbound SMB from any host.",
+                            "priority": 107,
+                            "sourcePortRange": "*",
+                            "destinationPortRange": "445",
+                            "protocol": "*",
+                            "sourceAddressPrefix": "VirtualNetwork",
+                            "destinationAddressPrefix": "*",
+                            "access": "Allow"
+                        }
+                    },
+                    {
+                        "name": "inboundKerberosChangeAllow",
+                        "properties": {
+                            "direction": "Inbound",
+                            "description": "Allow inbound Kerberos Change from any host.",
+                            "priority": 108,
+                            "sourcePortRange": "*",
+                            "destinationPortRange": "464",
+                            "protocol": "*",
+                            "sourceAddressPrefix": "VirtualNetwork",
+                            "destinationAddressPrefix": "*",
+                            "access": "Allow"
+                        }
+                    },
+                    {
+                        "name": "inboundLDAPSSLAllow",
+                        "properties": {
+                            "direction": "Inbound",
+                            "description": "Allow inbound LDAP SSL from any host.",
+                            "priority": 109,
+                            "sourcePortRange": "*",
+                            "destinationPortRange": "636",
+                            "protocol": "Tcp",
+                            "sourceAddressPrefix": "VirtualNetwork",
+                            "destinationAddressPrefix": "*",
+                            "access": "Allow"
+                        }
+                    },
+                    {
+                        "name": "inboundLDAPGCAllow",
+                        "properties": {
+                            "direction": "Inbound",
+                            "description": "Allow inbound LDAP GC from any host.",
+                            "priority": 110,
+                            "sourcePortRange": "*",
+                            "destinationPortRange": "3268",
+                            "protocol": "Tcp",
+                            "sourceAddressPrefix": "VirtualNetwork",
+                            "destinationAddressPrefix": "*",
+                            "access": "Allow"
+                        }
+                    },
+                    {
+                        "name": "inboundLDAPGCSSLAllow",
+                        "properties": {
+                            "direction": "Inbound",
+                            "description": "Allow inbound LDAP GC SSL from any host.",
+                            "priority": 111,
+                            "sourcePortRange": "*",
+                            "destinationPortRange": "3269",
+                            "protocol": "Tcp",
+                            "sourceAddressPrefix": "VirtualNetwork",
+                            "destinationAddressPrefix": "*",
+                            "access": "Allow"
+                        }
+                    },
+                    {
+                        "name": "inboundRPCDYNAllow",
+                        "properties": {
+                            "direction": "Inbound",
+                            "description": "Allow inbound RPC DYN from any host.",
+                            "priority": 112,
+                            "sourcePortRange": "*",
+                            "destinationPortRanges": [
+                                "49152-65535"
+                            ],
+                            "protocol": "Tcp",
+                            "sourceAddressPrefix": "VirtualNetwork",
+                            "destinationAddressPrefix": "*",
+                            "access": "Allow"
+                        }
+                    },
+                    {
+                        "name": "inboundAllTrafficDeny",
+                        "properties": {
+                            "direction": "Inbound",
+                            "description": "Deny All inbound from any host.",
+                            "priority": 113,
+                            "sourcePortRange": "*",
+                            "destinationPortRange": "*",
+                            "protocol": "*",
+                            "sourceAddressPrefix": "*",
+                            "destinationAddressPrefix": "*",
+                            "access": "Deny"
+                        }
+                    },
+                    {
+                        "name": "outboundRDPDeny",
+                        "properties": {
+                            "direction": "Outbound",
+                            "description": "Deny RDP outbound from any host.",
+                            "priority": 3389,
+                            "sourcePortRange": "*",
+                            "destinationPortRange": "*",
+                            "protocol": "*",
+                            "sourceAddressPrefix": "VirtualNetwork",
+                            "destinationAddressPrefix": "*",
+                            "access": "Deny"
+                        }
+                    }
+                ]
+            }
+        },
+        {
+            "type": "Microsoft.Network/virtualNetworks/subnets",
+            "apiVersion": "2020-05-01",
+            "name": "[concat(parameters('hubVirtualNetworkName'), '/', parameters('addsSubnetName'))]",
+            "location": "[variables('location')]",
+            "dependsOn": [
+                "[resourceId('Microsoft.Network/networkSecurityGroups', variables('addsNSGName'))]"
+            ],
+            "properties": {
+                "addressPrefix": "[parameters('addsSubnetAddressPrefix')]",
+                "networkSecurityGroup": {
+                    "id": "[resourceId('Microsoft.Network/networkSecurityGroups', variables('addsNSGName'))]"
+                }
+            }
+        }
+    ],
+    "outputs": {}
+}
