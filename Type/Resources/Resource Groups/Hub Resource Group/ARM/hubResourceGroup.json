@@ -1,0 +1,29 @@
+{
+    "$schema": "https://schema.management.azure.com/schemas/2018-05-01/subscriptionDeploymentTemplate.json#",
+    "contentVersion": "2020.09.18.1630",
+    "parameters": {
+        "rgLocation": {
+            "type": "string",
+            "metadata": {
+                "description": "The location of the Hub Resource Group."
+            }
+        },
+            "rgName": {
+            "type": "string",
+            "metadata": {
+                "description": "The name of the Hub Resource Group."
+            }
+        }
+    },
+    "functions": [],
+    "variables": {},
+    "resources": [
+        {
+        "type": "Microsoft.Resources/resourceGroups",
+        "apiVersion": "2019-10-01",
+        "location": "[parameters('rgLocation')]",
+        "name": "[parameters('rgName')]"
+        }
+    ],
+    "outputs": {}
+    }
