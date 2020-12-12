@@ -1,0 +1,144 @@
+{
+    "$schema": "https://schema.management.azure.com/schemas/2019-04-01/deploymentTemplate.json#",
+    "contentVersion": "2020.09.15.1400",
+    "parameters": {},
+    "variables": { 
+      "bastionNSGName": "[concat(toLower('azurebastion-'), toLower(resourceGroup().location), toLower('-snet-nsg'))]"
+     },
+    "resources": [
+      {
+        "type": "Microsoft.Network/networkSecurityGroups",
+        "apiVersion": "2020-05-01",
+        "name": "[variables('bastionNSGName')]",
+        "location": "[resourceGroup().location]",
+        "properties": {
+          "securityRules": [
+            {
+              "name": "InboundFromAnyAllow",
+              "properties": {
+                "direction": "Inbound",
+                "description": "Allow connection from any host on https.",
+                "priority": 100,
+                "sourcePortRange": "*",
+                "destinationPortRange": "443",
+                "protocol": "Tcp",
+                "sourceAddressPrefix": "Internet",
+                "destinationAddressPrefix": "*",
+                "access": "Allow"
+              }
+            },
+            {
+              "name": "InboundFromGatewayManagerAllow",
+              "properties": {
+                "direction": "Inbound",
+                "description": "Allow Gateway Manager connection to Azure Bastion host.",
+                "priority": 120,
+                "sourcePortRange": "*",
+                "destinationPortRanges": [
+                  "443",
+                  "4443"
+                ],
+                "protocol": "Tcp",
+                "sourceAddressPrefix": "GatewayManager",
+                "destinationAddressPrefix": "*",
+                "access" : "Allow"
+              }
+            },
+            {
+              "name": "InboundFromAnyDeny",
+              "properties": {
+                "direction": "Inbound",
+                "description": "Deny connection to Azure Bastion host.",
+                "priority": 900,
+                "sourcePortRange": "*",
+                "destinationPortRange": "*",
+                "protocol": "Tcp",
+                "sourceAddressPrefix": "GatewayManager",
+                "destinationAddressPrefix": "*",
+                "access" : "Allow"
+              }
+            },
+            {
+              "name": "OutboundToVNET_SSH_RDP",
+              "properties": {
+                "direction": "Outbound",
+                "description": "Allow connection to Virtual Machines over private IP on ssh and rdp.",
+                "priority": 100,
+                "sourcePortRange": "*",
+                "destinationPortRanges": [
+                  "22",
+                  "3389"
+                ],
+                "protocol": "Tcp",
+                "sourceAddressPrefix": "*",
+                "destinationAddressPrefix": "VirtualNetwork",
+                "access": "Allow"
+              }
+            },
+            {
+              "name": "OutboundToAzureCloud_HTTPS",
+              "properties": {
+                "direction": "Outbound",
+                "description": "Allow connection to other public endpoints in Azure on https.",
+                "priority": 120,
+                "sourcePortRange": "*",
+                "destinationPortRange": "443",
+                "protocol": "Tcp",
+                "sourceAddressPrefix": "*",
+                "destinationAddressPrefix": "AzureCloud",
+                "access": "Allow"
+              }
+            }
+          ]
+        }
+      },
+      {
+        "type": "Microsoft.Network/virtualNetworks",
+        "apiVersion": "2020-05-01",
+        "name": "[concat(toLower('hub-'), toLower(resourceGroup().location), toLower('-vnet-01'))]",
+        "location": "[resourceGroup().location]",
+        "tags": {},
+        "dependsOn": [
+          "[resourceId('Microsoft.Network/networkSecurityGroups', variables('bastionNSGName') )]"
+        ],
+        "properties": {
+          "addressSpace": {
+            "addressPrefixes": ["10.1.0.0/16"]
+          },
+          "subnets": [
+            {
+              "name": "GatewaySubnet",
+              "properties": {
+                "addressPrefix": "10.1.0.0/27"
+              }
+            },
+            {
+              "name": "AzureFirewallSubnet",
+              "properties": {
+                "addressPrefix": "10.1.1.0/26"
+              }
+            },
+            {
+              "name": "AzureBastionSubnet",
+              "properties": {
+                "addressPrefix": "10.1.2.0/27",
+                "networkSecurityGroup": {
+                  "id": "[resourceId('Microsoft.Network/networkSecurityGroups', variables('bastionNSGName') )]"
+                }
+              }
+            }
+          ]
+        }
+      },
+      {
+        "type": "Microsoft.Authorization/locks",
+        "apiVersion": "2016-09-01",
+        "name": "cannot-delete",
+        "properties": {
+          "level": "CanNotDelete",
+          "notes": "Protects the Hub Virtual Network from deletions."
+        }
+      }
+      ],
+    "outputs": {}
+  }
