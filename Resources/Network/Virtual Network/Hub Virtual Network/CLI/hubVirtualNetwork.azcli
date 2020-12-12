@@ -1,0 +1,65 @@
+# ----------------------------------------------------------------------------------------------
+# --- ABOUT
+
+# CREATED BY: Henry Gelderbloem
+# VERSION: 1.0
+
+# ----------------------------------------------------------------------------------------------
+# --- Variables
+
+# Resource Group
+RG_LOCATION="uksouth"
+RG_NAME="hub-prod-$RG_LOCATION-rg-01"
+
+# Hub Virtual Network
+VNET_NAME="hub-$RG_LOCATION-vnet-01"
+
+# Azure Bastion
+NSG_BASTION_NAME="bastion-$RG_LOCATION-snet-nsg"
+
+# ----------------------------------------------------------------------------------------------
+# --- Create Hub Resource Group
+
+# Create Hub Resource Group
+az group create --location $RG_LOCATION --name $RG_NAME
+
+# Wait until the Hub Resource Group is created, otherwise future commands may fail
+az group wait --created --interval 1 --name $RG_NAME
+
+# Create Resource Group cannot delete lock
+az group lock create --resource-group $RG_NAME --lock-type CanNotDelete --name "Cannot delete $RG_NAME" --notes "Protects $RG_NAME from deletion."
+
+# ----------------------------------------------------------------------------------------------
+# --- Create Azure Bastion Network Secuirty Group
+
+# Create Azure Bastion Network Security Group
+az network nsg create --resource-group $RG_NAME --location $RG_LOCATION --name $NSG_BASTION_NAME
+
+# Create Azure Bastion Network Security Group required rules
+
+# Inbound Rules
+az network nsg rule create --resource-group $RG_NAME --nsg-name $NSG_BASTION_NAME --direction Inbound --source-address-prefixes 'Internet' --source-port-ranges '*' --destination-address-prefixes '*' --destination-port-ranges 443 --protocol Tcp --access Allow --priority 100 --name InboundFromAnyAllow --description "Allow connection from any host on https."
+
+az network nsg rule create --resource-group $RG_NAME --nsg-name $NSG_BASTION_NAME --direction Inbound --source-address-prefixes GatewayManager --source-port-ranges '*' --destination-address-prefixes '*' --destination-port-ranges 443 4443 --protocol Tcp --access Allow --priority 120 --name InboundFromGatewayManagerAllow --description "Allow Gateway Manager connection to Azure Bastion host."
+
+az network nsg rule create --resource-group $RG_NAME --nsg-name $NSG_BASTION_NAME --direction Inbound --source-address-prefixes '*' --source-port-ranges '*' --destination-address-prefixes '*' --destination-port-ranges '*' --protocol '*' --access Deny --priority 900 --name InboundFromAnyDeny --description "Deny connection to Azure Bastion host." 
+
+# Outbound Rules
+az network nsg rule create --resource-group $RG_NAME --nsg-name $NSG_BASTION_NAME --direction Outbound --source-address-prefixes '*' --source-port-ranges '*' --destination-address-prefixes VirtualNetwork --destination-port-ranges 22 3389 --protocol Tcp --access Allow --priority 100 --name OutboundToVNET_SSH_RDP --description "Allow connection to Virtual Machines over private IP on ssh and rdp." 
+
+az network nsg rule create --resource-group $RG_NAME --nsg-name $NSG_BASTION_NAME --direction Outbound --source-address-prefixes '*' --source-port-ranges '*' --destination-address-prefixes AzureCloud --destination-port-ranges 443 --protocol Tcp --access Allow --priority 120 --name OutboundToAzureCloud_HTTPS --description "Allow connection to other public endpoints in Azure on https."
+
+# ----------------------------------------------------------------------------------------------
+# --- Create Hub Virtual Network
+
+# Create Hub Virtual Network
+az network vnet create --resource-group $RG_NAME --location $RG_LOCATION --name $VNET_NAME --address-prefixes 10.1.0.0/16
+
+# Create GatewaySubnet
+az network vnet subnet create --resource-group $RG_NAME --vnet-name $VNET_NAME --name GatewaySubnet --address-prefixes 10.1.0.0/27
+
+# Create AzureFirewallSubnet
+az network vnet subnet create --resource-group $RG_NAME --vnet-name $VNET_NAME --name AzureFirewallSubnet --address-prefixes 10.1.1.0/26
+
+# Create AzureBastionSubnet
+az network vnet subnet create --resource-group $RG_NAME --vnet-name $VNET_NAME --name AzureBastionSubnet --address-prefixes 10.1.2.0/27 --network-security-group $NSG_BASTION_NAME
