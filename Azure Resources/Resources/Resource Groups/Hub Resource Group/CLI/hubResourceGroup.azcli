@@ -9,7 +9,7 @@
 
 # Resource Group
 RG_LOCATION="uksouth"
-RG_NAME="hub-prod-$RG_LOCATION-rg-01"
+RG_NAME="prod-hub-$RG_LOCATION-rg-01"
 
 # ----------------------------------------------------------------------------------------------
 # --- Create Hub Resource Group
