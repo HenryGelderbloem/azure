@@ -1,0 +1,23 @@
+{
+    "$schema": "https://schema.management.azure.com/schemas/2018-05-01/subscriptionDeploymentTemplate.json#",
+    "contentVersion": "2020.12.22.1645",
+    "parameters": {
+        "rgLocation": {
+            "type": "string",
+            "metadata": {
+                "description": "The location of the AD DS Resource Group."
+            }
+        }
+    },
+    "functions": [],
+    "variables": {},
+    "resources": [
+        {
+        "type": "Microsoft.Resources/resourceGroups",
+        "apiVersion": "2019-10-01",
+        "location": "[parameters('rgLocation')]",
+        "name": "[concat(toLower('prod-adds-'), toLower(parameters('rgLocation')), toLower('-rg-01'))]"
+        }
+    ],
+    "outputs": {}
+    }
