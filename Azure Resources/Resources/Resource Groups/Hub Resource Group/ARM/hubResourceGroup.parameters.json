@@ -1,12 +1,9 @@
 {
     "$schema": "https://schema.management.azure.com/schemas/2019-04-01/deploymentParameters.json#",
-    "contentVersion": "2020.09.18.1630",
+    "contentVersion": "2020.12.22.1630",
     "parameters": {
         "rgLocation": {
-            "value": "UK South"
-        },
-        "rgName": {
-            "value": "[concat(toLower('hub-prod-'), parameters('rgLocation'), toLower('-rg-01'))]"
+            "value": "uksouth"
         }
     }
 }
