@@ -11,7 +11,7 @@
 $rgLocation = Read-Host -Prompt "Enter the Resource Group location"
 
 # Resource Group Name
-$rgName = "hub-prod-$rgLocation-rg-01"
+$rgName = "prod-hub-$rgLocation-rg-01"
 
 # ----------------------------------------------------------------------------------------------
 # --- Create Hub Resource Group
