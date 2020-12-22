@@ -1,9 +1,10 @@
 {
     "$schema": "https://schema.management.azure.com/schemas/2019-04-01/deploymentTemplate.json#",
-    "contentVersion": "2020.09.15.1400",
+    "contentVersion": "2020.12.22.1730",
     "parameters": {},
     "variables": { 
-      "bastionNSGName": "[concat(toLower('azurebastion-'), toLower(resourceGroup().location), toLower('-snet-nsg'))]"
+      "bastionNSGName": "[concat(toLower('azurebastion-'), toLower(resourceGroup().location), toLower('-snet-nsg'))]",
+      "hubVirtualNetworkName": "[concat(toLower('hub-'), toLower(resourceGroup().location), toLower('-vnet-01'))]"
      },
     "resources": [
       {
@@ -14,7 +15,7 @@
         "properties": {
           "securityRules": [
             {
-              "name": "InboundFromAnyAllow",
+              "name": "allowInboundFromAny",
               "properties": {
                 "direction": "Inbound",
                 "description": "Allow connection from any host on https.",
@@ -28,7 +29,7 @@
               }
             },
             {
-              "name": "InboundFromGatewayManagerAllow",
+              "name": "allowInboundFromGatewayManager",
               "properties": {
                 "direction": "Inbound",
                 "description": "Allow Gateway Manager connection to Azure Bastion host.",
@@ -45,7 +46,7 @@
               }
             },
             {
-              "name": "InboundFromAnyDeny",
+              "name": "allowInboundFromAny",
               "properties": {
                 "direction": "Inbound",
                 "description": "Deny connection to Azure Bastion host.",
@@ -59,7 +60,7 @@
               }
             },
             {
-              "name": "OutboundToVNET_SSH_RDP",
+              "name": "allowOutboundToVNET_SSH_RDP",
               "properties": {
                 "direction": "Outbound",
                 "description": "Allow connection to Virtual Machines over private IP on ssh and rdp.",
@@ -76,7 +77,7 @@
               }
             },
             {
-              "name": "OutboundToAzureCloud_HTTPS",
+              "name": "allowOutboundToAzureCloud_HTTPS",
               "properties": {
                 "direction": "Outbound",
                 "description": "Allow connection to other public endpoints in Azure on https.",
@@ -95,11 +96,11 @@
       {
         "type": "Microsoft.Network/virtualNetworks",
         "apiVersion": "2020-05-01",
-        "name": "[concat(toLower('hub-'), toLower(resourceGroup().location), toLower('-vnet-01'))]",
+        "name": "[variables('hubVirtualNetworkName')]",
         "location": "[resourceGroup().location]",
         "tags": {},
         "dependsOn": [
-          "[resourceId('Microsoft.Network/networkSecurityGroups', variables('bastionNSGName') )]"
+          "[resourceId('Microsoft.Network/networkSecurityGroups', variables('bastionNSGName'))]"
         ],
         "properties": {
           "addressSpace": {
@@ -136,7 +137,7 @@
         "name": "cannot-delete",
         "properties": {
           "level": "CanNotDelete",
-          "notes": "Protects the Hub Virtual Network from deletions."
+          "notes": "Protects the Hub Virtual Network from deletion."
         }
       }
       ],
