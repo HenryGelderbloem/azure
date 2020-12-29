@@ -16,7 +16,7 @@
         "type": "Microsoft.Resources/resourceGroups",
         "apiVersion": "2019-10-01",
         "location": "[parameters('rgLocation')]",
-        "name": "[concat(toLower('prod-hub-'), toLower(parameters('rgLocation')), toLower('-rg-01'))]"
+        "name": "[concat(toLower('hub-'), toLower(parameters('rgLocation')), toLower('-rg-01'))]"
         }
     ],
     "outputs": {}

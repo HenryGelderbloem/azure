@@ -3,7 +3,7 @@
     "contentVersion": "2020.12.22.1730",
     "parameters": {},
     "variables": { 
-      "bastionNSGName": "[concat(toLower('azurebastion-'), toLower(resourceGroup().location), toLower('-snet-nsg'))]",
+      "bastionNSGName": "[concat(toLower('azurebastion-'), toLower(resourceGroup().location), toLower('-snet-nsg-01'))]",
       "hubVirtualNetworkName": "[concat(toLower('hub-'), toLower(resourceGroup().location), toLower('-vnet-01'))]"
      },
     "resources": [
@@ -46,7 +46,7 @@
               }
             },
             {
-              "name": "allowInboundFromAny",
+              "name": "denyInboundFromAny",
               "properties": {
                 "direction": "Inbound",
                 "description": "Deny connection to Azure Bastion host.",
@@ -56,7 +56,7 @@
                 "protocol": "Tcp",
                 "sourceAddressPrefix": "GatewayManager",
                 "destinationAddressPrefix": "*",
-                "access" : "Allow"
+                "access" : "Deny"
               }
             },
             {

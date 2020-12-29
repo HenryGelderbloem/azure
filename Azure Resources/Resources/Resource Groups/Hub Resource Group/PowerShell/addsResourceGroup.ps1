@@ -11,7 +11,7 @@
 $rgLocation = Read-Host -Prompt "Enter the Resource Group location"
 
 # Resource Group Name
-$rgName = "prod-adds-$rgLocation-rg-01"
+$rgName = "adds-$rgLocation-rg-01"
 
 # ----------------------------------------------------------------------------------------------
 # --- Create AD DS Resource Group

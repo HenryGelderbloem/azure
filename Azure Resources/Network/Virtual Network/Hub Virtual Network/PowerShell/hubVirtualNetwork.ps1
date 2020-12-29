@@ -9,7 +9,7 @@
 
 # Resource Group
 $rgLocation = "uksouth"
-$rgName = "hub-prod-$rgLocation-rg-01"
+$rgName = "hub-$rgLocation-rg-01"
 
 # Hub Virtual Network
 $vnetName = "hub-$rgLocation-vnet-01"
