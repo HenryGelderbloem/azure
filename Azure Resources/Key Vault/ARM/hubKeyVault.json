@@ -1,0 +1,10 @@
+{
+    "$schema": "https://schema.management.azure.com/schemas/2019-04-01/deploymentTemplate.json#",
+    "contentVersion": "2020.12.08.2200",
+    "parameters": {},
+    "variables": {
+        "keyVaultName": "[concat(toLower('hub-'), toLower(resourceGroup().location), toLower('-keyvault-01'))]"
+    },
+    "resources": [],
+    "outputs": {}
+}

@@ -1,0 +1,285 @@
+{
+    "$schema": "https://schema.management.azure.com/schemas/2019-04-01/deploymentTemplate.json#",
+    "contentVersion": "2020.12.22.1730",
+    "parameters": {},
+    "variables": { 
+      "hubVirtualNetworkName": "hub-uksouth-rg-01",
+      "addsSubnetName": "[concat(toLower('adds-'), toLower(resourceGroup().location), toLower('-snet-01'))]",
+      "addsSubnetNSGName": "[concat(toLower('adds-'), toLower(resourceGroup().location), toLower('-snet-nsg'))]",
+      "addsVMNSGName": "[concat(toLower('adds-'), toLower(resourceGroup().location), toLower('-vm-nsg'))]",
+      "addsSubnetAddressRange": "10.1.3.0/24"
+     },
+    "resources": [
+      {
+        "type": "Microsoft.Network/networkSecurityGroups",
+        "apiVersion": "2020-05-01",
+        "name": "[variables('addsSubnetNSGName')]",
+        "location": "[resourceGroup().location]",
+        "properties": {
+          "securityRules": [
+            {
+              "name": "allowInboundDNS",
+              "properties": {
+                "direction": "Inbound",
+                "description": "Allow inbound DNS traffic.",
+                "priority": 200,
+                "sourcePortRange": "*",
+                "destinationPortRange": "53",
+                "protocol": "*",
+                "sourceAddressPrefix": "VirtualNetwork",
+                "destinationAddressPrefix": "[variables('addsSubnetAddressRange')]",
+                "access": "Allow"
+              }
+            },
+            {
+              "name": "allowInboundKerberos",
+              "properties": {
+                "direction": "Inbound",
+                "description": "Allow inbound Kerberos traffic.",
+                "priority": 210,
+                "sourcePortRange": "*",
+                "destinationPortRange": "88",
+                "protocol": "*",
+                "sourceAddressPrefix": "VirtualNetwork",
+                "destinationAddressPrefix": "[variables('addsSubnetAddressRange')]",
+                "access" : "Allow"
+              }
+            },
+            {
+              "name": "allowInboundNTP",
+              "properties": {
+                "direction": "Inbound",
+                "description": "Allow inbound NTP traffic.",
+                "priority": 220,
+                "sourcePortRange": "*",
+                "destinationPortRange": "123",
+                "protocol": "Udp",
+                "sourceAddressPrefix": "VirtualNetwork",
+                "destinationAddressPrefix": "[variables('addsSubnetAddressRange')]",
+                "access" : "Allow"
+              }
+            },
+            {
+              "name": "allowInboundrpcEndpointMapper",
+              "properties": {
+                "direction": "Inbound",
+                "description": "Allow inbound RPC traffic.",
+                "priority": 230,
+                "sourcePortRange": "*",
+                "destinationPortRange": "135",
+                "protocol": "Tcp",
+                "sourceAddressPrefix": "VirtualNetwork",
+                "destinationAddressPrefix": "[variables('addsSubnetAddressRange')]",
+                "access": "Allow"
+              }
+            },
+            {
+              "name": "allowInboundNetbios",
+              "properties": {
+                "direction": "Inbound",
+                "description": "Allow inbound Netbios traffic.",
+                "priority": 240,
+                "sourcePortRange": "*",
+                "destinationPortRanges": [
+                    "137",
+                    "138"
+                ],
+                "protocol": "Udp",
+                "sourceAddressPrefix": "VirtualNetwork",
+                "destinationAddressPrefix": "[variables('addsSubnetAddressRange')]",
+                "access": "Allow"
+              }
+            },
+            {
+              "name": "allowInboundNetbiosSesion",
+              "properties": {
+                "direction": "Inbound",
+                "description": "Allow inbound NTP Session traffic.",
+                "priority": 250,
+                "sourcePortRange": "*",
+                "destinationPortRange": "139",
+                "protocol": "Tcp",
+                "sourceAddressPrefix": "VirtualNetwork",
+                "destinationAddressPrefix": "[variables('addsSubnetAddressRange')]",
+                "access" : "Allow"
+              }
+            },
+            {
+              "name": "allowInboundLdap",
+              "properties": {
+                "direction": "Inbound",
+                "description": "Allow inbound ldap traffic.",
+                "priority": 260,
+                "sourcePortRange": "*",
+                "destinationPortRange": "389",
+                "protocol": "*",
+                "sourceAddressPrefix": "VirtualNetwork",
+                "destinationAddressPrefix": "[variables('addsSubnetAddressRange')]",
+                "access" : "Allow"
+              }
+            },
+            {
+              "name": "allowInboundSMB",
+              "properties": {
+                "direction": "Inbound",
+                "description": "Allow inbound SMB traffic.",
+                "priority": 270,
+                "sourcePortRange": "*",
+                "destinationPortRange": "445",
+                "protocol": "Tcp",
+                "sourceAddressPrefix": "VirtualNetwork",
+                "destinationAddressPrefix": "[variables('addsSubnetAddressRange')]",
+                "access" : "Allow"
+              }
+            },
+            {
+              "name": "allowInboundKerberosChange",
+              "properties": {
+                "direction": "Inbound",
+                "description": "Allow inbound Kerberos Change traffic.",
+                "priority": 280,
+                "sourcePortRange": "*",
+                "destinationPortRange": "464",
+                "protocol": "*",
+                "sourceAddressPrefix": "VirtualNetwork",
+                "destinationAddressPrefix": "[variables('addsSubnetAddressRange')]",
+                "access" : "Allow"
+              }
+            },
+            {
+              "name": "allowInboundLdapSSL",
+              "properties": {
+                "direction": "Inbound",
+                "description": "Allow inbound ldap SSL traffic.",
+                "priority": 290,
+                "sourcePortRange": "*",
+                "destinationPortRange": "636",
+                "protocol": "Tcp",
+                "sourceAddressPrefix": "VirtualNetwork",
+                "destinationAddressPrefix": "[variables('addsSubnetAddressRange')]",
+                "access" : "Allow"
+              }
+            },
+            {
+              "name": "allowInboundLdapGC",
+              "properties": {
+                "direction": "Inbound",
+                "description": "Allow inbound ldap GC traffic.",
+                "priority": 300,
+                "sourcePortRange": "*",
+                "destinationPortRange": "3268",
+                "protocol": "Tcp",
+                "sourceAddressPrefix": "VirtualNetwork",
+                "destinationAddressPrefix": "[variables('addsSubnetAddressRange')]",
+                "access" : "Allow"
+              }
+            },
+            {
+              "name": "allowInboundldapGCSSL",
+              "properties": {
+                "direction": "Inbound",
+                "description": "Allow inbound ldap GC SSL traffic.",
+                "priority": 310,
+                "sourcePortRange": "*",
+                "destinationPortRange": "3269",
+                "protocol": "Tcp",
+                "sourceAddressPrefix": "VirtualNetwork",
+                "destinationAddressPrefix": "[variables('addsSubnetAddressRange')]",
+                "access" : "Allow"
+              }
+            },
+            {
+              "name": "allowInboundrpcDYN",
+              "properties": {
+                "direction": "Inbound",
+                "description": "Allow inbound RPC traffic.",
+                "priority": 320,
+                "sourcePortRange": "*",
+                "destinationPortRange": "49152-65535",
+                "protocol": "Tcp",
+                "sourceAddressPrefix": "VirtualNetwork",
+                "destinationAddressPrefix": "[variables('addsSubnetAddressRange')]",
+                "access" : "Allow"
+              }
+            },
+            {
+              "name": "denyInboundAllTraffic",
+              "properties": {
+                "direction": "Inbound",
+                "description": "Deny all other inbound traffic.",
+                "priority": 4096,
+                "sourcePortRange": "*",
+                "destinationPortRange": "*",
+                "protocol": "Tcp",
+                "sourceAddressPrefix": "*",
+                "destinationAddressPrefix": "*",
+                "access" : "Deny"
+              }
+            },
+            {
+              "name": "denyOutboundRdpSsh",
+              "properties": {
+                "direction": "Outbound",
+                "description": "Deny outbound RDP & SSH traffic.",
+                "priority": 3389,
+                "sourcePortRange": "*",
+                "destinationPortRange": "22,3389",
+                "protocol": "*",
+                "sourceAddressPrefix": "*",
+                "destinationAddressPrefix": "*",
+                "access" : "Deny"
+              }
+            }
+          ]
+        }
+      },
+      {
+        "type": "Microsoft.Network/virtualNetworks",
+        "apiVersion": "2020-05-01",
+        "name": "[variables('hubVirtualNetworkName')]",
+        "location": "[resourceGroup().location]",
+        "tags": {},
+        "dependsOn": [
+          "[resourceId('Microsoft.Network/networkSecurityGroups', variables('addsSubnetNSGName'))]"
+        ],
+        "properties": {
+          "addressSpace": {
+            "addressPrefixes": ["10.1.0.0/16"]
+          },
+          "subnets": [
+            {
+              "name": "GatewaySubnet",
+              "properties": {
+                "addressPrefix": "10.1.0.0/27"
+              }
+            },
+            {
+              "name": "AzureFirewallSubnet",
+              "properties": {
+                "addressPrefix": "10.1.1.0/26"
+              }
+            },
+            {
+              "name": "AzureBastionSubnet",
+              "properties": {
+                "addressPrefix": "10.1.2.0/27",
+                "networkSecurityGroup": {
+                  "id": "[resourceId('Microsoft.Network/networkSecurityGroups', variables('addsSubnetNSGName') )]"
+                }
+              }
+            }
+          ]
+        }
+      },
+      {
+        "type": "Microsoft.Authorization/locks",
+        "apiVersion": "2016-09-01",
+        "name": "cannot-delete",
+        "properties": {
+          "level": "CanNotDelete",
+          "notes": "Protects the Hub Virtual Network from deletion."
+        }
+      }
+      ],
+    "outputs": {}
+  }
